@@ -3,8 +3,23 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import Icon from "@/components/ui/icon";
+import { useUser } from "@/contexts/UserContext";
+import { Link } from "react-router-dom";
 
 const Index = () => {
+  const { user, isAuthenticated, login } = useUser();
+
+  const handleDiscordLogin = () => {
+    const mockUser = {
+      id: "123456789",
+      username: "TestUser",
+      discriminator: "1234",
+      avatar: "https://cdn.discordapp.com/embed/avatars/0.png",
+      role: "user" as const,
+      balance: 100
+    };
+    login(mockUser);
+  };
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {/* Навигация */}
@@ -18,16 +33,26 @@ const Index = () => {
               <span className="text-xl font-bold text-white">MineCraft</span>
             </div>
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#" className="text-purple-300 hover:text-white transition-colors">Главная</a>
-              <a href="#" className="text-purple-300 hover:text-white transition-colors">Сервера</a>
-              <a href="#" className="text-purple-300 hover:text-white transition-colors">Статистика</a>
-              <a href="#" className="text-purple-300 hover:text-white transition-colors">Википедия</a>
-              <a href="#" className="text-purple-300 hover:text-white transition-colors">Магазин</a>
+              <Link to="/" className="text-purple-300 hover:text-white transition-colors">Главная</Link>
+              <Link to="/statistics" className="text-purple-300 hover:text-white transition-colors">Статистика</Link>
+              <Link to="/shop" className="text-purple-300 hover:text-white transition-colors">Магазин</Link>
+              <Link to="/wiki" className="text-purple-300 hover:text-white transition-colors">Википедия</Link>
+              {isAuthenticated && user?.role === 'admin' && (
+                <Link to="/admin" className="text-purple-300 hover:text-white transition-colors">Админка</Link>
+              )}
             </div>
-            <Button className="bg-purple-600 hover:bg-purple-700 text-white">
-              <Icon name="Users" size={16} className="mr-2" />
-              Войти через Discord
-            </Button>
+            {isAuthenticated ? (
+              <div className="flex items-center space-x-3">
+                <img src={user?.avatar} alt="Avatar" className="w-8 h-8 rounded-full" />
+                <span className="text-white">{user?.username}</span>
+                <Badge className="bg-purple-500/20 text-purple-300">{user?.balance}₽</Badge>
+              </div>
+            ) : (
+              <Button onClick={handleDiscordLogin} className="bg-purple-600 hover:bg-purple-700 text-white">
+                <Icon name="Users" size={16} className="mr-2" />
+                Войти через Discord
+              </Button>
+            )}
           </div>
         </div>
       </nav>
